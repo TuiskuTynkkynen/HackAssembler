@@ -2,6 +2,7 @@
 
 #include <string>
 #include <string_view>
+#include <cassert>
 
 namespace Lexer {
     class TokenType {
@@ -40,6 +41,9 @@ namespace Lexer {
             case String:  return "String";
             case EndOfStream:  return "EndOfStream";
             }
+
+            assert(false);
+            return "Invalid";
         }
     private:
         Value m_Type = Invalid;
