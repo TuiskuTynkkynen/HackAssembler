@@ -1,8 +1,6 @@
 #include "Lexer.h"
 
-#include <vector>
 #include <istream>
-#include <sstream>
 
 enum class State : uint8_t {
     None = 0,
