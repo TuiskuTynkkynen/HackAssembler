@@ -2,7 +2,7 @@
 
 pushd ..
 
-if [ ! -D "./Vendor/premake/bin/release/" ]; then
+if [ ! -d "./Vendor/premake/bin/release/" ]; then
     pushd ./Vendor/premake/
     ./Bootstrap.sh
     popd
