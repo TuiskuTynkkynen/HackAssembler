@@ -13,7 +13,7 @@ enum class State : uint8_t {
 };
 
 static constexpr bool IsOperation(char character) {
-    return character == '=' || character == ';' || character == '+' || character == '-' || character == '&' || character == '|';
+    return character == '=' || character == ';' || character == '!' || character == '+' || character == '-' || character == '&' || character == '|';
 }
 
 static constexpr bool IsNumeric(char character) {
