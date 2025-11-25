@@ -40,15 +40,15 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
     TokenType tokenType = TokenType::EndOfStream;
     
     while (state != State::Terminal && stream.get(character).good()) {
-        tokenType = TokenType::Value(TokenType::Invalid + (uint8_t)state);
-
         switch (state) {
         case State::None:
-            if (character == '/' && stream.peek() == '/') { state = State::Comment; break; }
-            if (IsOperation(character)) { state = State::Operation; break; }
-            if (character == '(') { stream.get(character); state = State::Label; break; }
-            if (IsNumeric(character)) { state = State::Integer; break; }
-            if (IsSymbol(character)) { state = State::String; break; }
+            if (character == '/' && stream.peek() == '/') { state = State::Comment; }
+            if (IsOperation(character)) { state = State::Operation; }
+            if (character == '(') { stream.get(character); state = State::Label; }
+            if (IsNumeric(character)) { state = State::Integer; }
+            if (IsAlpha(character) || IsSpecial(character)) { state = State::String; }
+
+            tokenType = TokenType::Value(TokenType::Invalid + (uint8_t)state);
             break;
         case State::Comment:
             state = (character == '\n') ? State::Terminal : state;
