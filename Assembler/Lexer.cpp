@@ -20,8 +20,17 @@ static constexpr bool IsNumeric(char character) {
     return '0' <= character && character <= '9';
 }
 
-static constexpr bool IsAlphaNumeric(char character) {
-    return IsNumeric(character) || 'A' <= character && character <= 'Z' || 'a' <= character && character <= 'z';
+static constexpr bool IsAlpha(char character) {
+    character &= ~32;
+    return 'A' <= character && character <= 'Z';
+}
+
+static constexpr bool IsSpecial(char character) {
+    return  character == '_' || character == '.' || character == '$' || character == ':';
+}
+
+static constexpr bool IsSymbol(char character) {
+    return IsNumeric(character) || IsAlpha(character) || IsSpecial(character);
 }
 
 Lexer::Token Lexer::GetNextToken(std::istream& stream) {
@@ -39,7 +48,7 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
             if (IsOperation(character)) { state = State::Operation; break; }
             if (character == '(') { stream.get(character); state = State::Label; break; }
             if (IsNumeric(character)) { state = State::Integer; break; }
-            if (IsAlphaNumeric(character)) { state = State::String; break; }
+            if (IsSymbol(character)) { state = State::String; break; }
             break;
         case State::Comment:
             state = (character == '\n') ? State::Terminal : state;
@@ -48,7 +57,7 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
             state = State::Terminal;
             break;
         case State::Label:
-            if (!IsAlphaNumeric(character)) {
+            if (!IsSymbol(character)) {
                 state = State::Terminal;
                 stream.get();
             }
@@ -57,8 +66,7 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
             state = !IsNumeric(character) ? State::Terminal : state;
             break;
         case State::String:
-            tokenType = (character == ':') ? TokenType::Label : TokenType::String;
-            state = !IsAlphaNumeric(character) ? State::Terminal : state;
+            state = !IsSymbol(character) ? State::Terminal : state;
             break;
         }
 
