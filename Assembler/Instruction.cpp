@@ -37,7 +37,7 @@ std::expected<ComputeInstruction, ComputeInstruction::ParseError> ComputeInstruc
     ComputeInstruction result = {};
 
     const int32_t maxIndex = static_cast<int32_t>(semanticStack.size()) - 1;
-    for (int32_t currentIndex = maxIndex; 1 < currentIndex; currentIndex -= 2) {
+    for (int32_t currentIndex = maxIndex; 0 < currentIndex; currentIndex -= 2) {
         if (currentIndex == 1 && semanticStack[0].GetType() == SemanticToken::Type::Registers) { // Ugly hack
             break; 
         }
