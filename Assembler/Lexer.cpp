@@ -47,11 +47,11 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
         switch (state) {
         case State::None:
             if (character == '\n') { state = State::Newline; }
-            if (character == '/' && stream.peek() == '/') {  state = State::Comment; }
-            if (IsOperation(character)) { state = State::Operation; }
-            if (character == '(') { stream.get(character); state = State::Label; }
-            if (IsNumeric(character)) { state = State::Integer; }
-            if (IsAlpha(character) || IsSpecial(character)) { state = State::String; }
+            else if (character == '/' && stream.peek() == '/') {  state = State::Comment; }
+            else if (IsOperation(character)) { state = State::Operation; }
+            else if (character == '(') { stream.get(character); state = State::Label; }
+            else if (IsNumeric(character)) { state = State::Integer; }
+            else if (IsAlpha(character) || IsSpecial(character)) { state = State::String; }
 
             tokenType = TokenType::Value(TokenType::Invalid + (uint8_t)state);
             break;
