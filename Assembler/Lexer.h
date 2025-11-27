@@ -15,6 +15,7 @@ namespace Lexer {
             Integer,
             String,
             EndOfStream,
+            Newline,
         };
 
         constexpr TokenType() = default;
@@ -40,6 +41,7 @@ namespace Lexer {
             case Integer:   return "Integer";
             case String:  return "String";
             case EndOfStream:  return "EndOfStream";
+            case Newline:  return "Newline";
             }
 
             assert(false);

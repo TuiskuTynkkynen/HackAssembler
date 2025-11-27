@@ -9,7 +9,8 @@ enum class State : uint8_t {
     Label,
     Integer,
     String,
-    Terminal
+    Terminal,
+    Newline,
 };
 
 static constexpr bool IsOperation(char character) {
@@ -42,7 +43,8 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
     while (state != State::Terminal && stream.get(character).good()) {
         switch (state) {
         case State::None:
-            if (character == '/' && stream.peek() == '/') { state = State::Comment; }
+            if (character == '\n') { state = State::Newline; }
+            if (character == '/' && stream.peek() == '/') {  state = State::Comment; }
             if (IsOperation(character)) { state = State::Operation; }
             if (character == '(') { stream.get(character); state = State::Label; }
             if (IsNumeric(character)) { state = State::Integer; }
@@ -53,6 +55,7 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
         case State::Comment:
             state = (character == '\n') ? State::Terminal : state;
             break;
+        case State::Newline:
         case State::Operation:
             state = State::Terminal;
             break;
