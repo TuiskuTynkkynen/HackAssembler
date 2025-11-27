@@ -21,31 +21,31 @@ struct Comparison {
     Operations Operation;
 };
 
-struct ComputeInstruction {
-    Destination Destination;
-    Comparison Comparison;
-    Jumps Jump;
-
+namespace Instructions {
     enum class ParseError : uint8_t {
+        InvalidSemanticTokenType, 
         InvalidSemanticTokenCount,
         InvalidOperationOrder,
         InvalidDestination,
         InvalidOperand,
         InvalidJump,
     };
+}
 
-    static std::expected<ComputeInstruction, ParseError> Create(std::span<const SemanticToken> semanticTokens);
+struct ComputeInstruction {
+    Destination Destination;
+    Comparison Comparison;
+    Jumps Jump;
+
+
+    static std::expected<ComputeInstruction, Instructions::ParseError> Create(std::span<const SemanticToken> semanticTokens);
     std::string ToString() const;
 };
 
 struct AddressingInstruction {
     std::variant<std::string, uint16_t> Variable;
 
-    enum class ParseError : uint8_t {
-        InvalidSemanticTokenType,
-    };
-
-    static std::expected<AddressingInstruction, ParseError> Create(const SemanticToken& semanticToken);
+    static std::expected<AddressingInstruction, Instructions::ParseError> Create(const SemanticToken& semanticToken);
     std::string ToString() const;
 };
 

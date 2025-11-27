@@ -7,10 +7,10 @@ static constexpr bool IsUnaryOperation(const SemanticToken& semantic) {
     return ptr && (*ptr == Operations::Negation || *ptr == Operations::Substraction);
 }
 
-std::expected<Operands, ComputeInstruction::ParseError> TryParseOperand(const SemanticToken& semantic) {
+static constexpr std::expected<Operands, Instructions::ParseError> TryParseOperand(const SemanticToken& semantic) {
     if (const uint16_t* integer = semantic.TryGetData<uint16_t>(); integer) {
         if (*integer > 1) {
-            return std::unexpected(ComputeInstruction::ParseError::InvalidOperand);
+            return std::unexpected(Instructions::ParseError::InvalidOperand);
         }
 
         return *integer == 1 ? Operands::One : Operands::Zero;
@@ -18,7 +18,7 @@ std::expected<Operands, ComputeInstruction::ParseError> TryParseOperand(const Se
 
     if (const ::Destination* registers = semantic.TryGetData<::Destination>(); registers) {
         if (registers->A + registers->D + registers->M != 1) {
-            return std::unexpected(ComputeInstruction::ParseError::InvalidOperand);
+            return std::unexpected(Instructions::ParseError::InvalidOperand);
         }
 
         if (registers->A) { return Operands::A; } 
@@ -26,12 +26,12 @@ std::expected<Operands, ComputeInstruction::ParseError> TryParseOperand(const Se
         if (registers->M) { return Operands::M; }
     }
 
-    return std::unexpected(ComputeInstruction::ParseError::InvalidOperand);
+    return std::unexpected(Instructions::ParseError::InvalidOperand);
 }
 
-std::expected<ComputeInstruction, ComputeInstruction::ParseError> ComputeInstruction::Create(std::span<const SemanticToken> semanticStack) {
+std::expected<ComputeInstruction, Instructions::ParseError> ComputeInstruction::Create(std::span<const SemanticToken> semanticStack) {
     if (1 >= semanticStack.size() || semanticStack.size() > 7){
-        return std::unexpected(ParseError::InvalidSemanticTokenCount);
+        return std::unexpected(Instructions::ParseError::InvalidSemanticTokenCount);
     }
 
     ComputeInstruction result = {};
@@ -44,17 +44,17 @@ std::expected<ComputeInstruction, ComputeInstruction::ParseError> ComputeInstruc
         
         const Operations* operation = semanticStack[currentIndex - 1].TryGetData<Operations>();
         if (!operation) {
-            return std::unexpected(ParseError::InvalidOperationOrder);
+            return std::unexpected(Instructions::ParseError::InvalidOperationOrder);
         }
 
         if (*operation == Operations::Jump) {
             if (currentIndex != maxIndex) {
-                return std::unexpected(ParseError::InvalidOperationOrder);
+                return std::unexpected(Instructions::ParseError::InvalidOperationOrder);
             }
 
             auto jump = semanticStack[currentIndex].TryGetData<Jumps>();
             if (!jump) {
-                return std::unexpected(ParseError::InvalidJump);
+                return std::unexpected(Instructions::ParseError::InvalidJump);
             }
 
             result.Jump = *jump;
@@ -63,7 +63,7 @@ std::expected<ComputeInstruction, ComputeInstruction::ParseError> ComputeInstruc
 
         if (*operation == Operations::Assignment) {
             if (currentIndex != 2) { // Must be last operation
-                return std::unexpected(ParseError::InvalidOperationOrder);
+                return std::unexpected(Instructions::ParseError::InvalidOperationOrder);
             }
 
             auto res = IsUnaryOperation(semanticStack[currentIndex]) ? Operands::None : TryParseOperand(semanticStack[currentIndex]);
@@ -87,7 +87,7 @@ std::expected<ComputeInstruction, ComputeInstruction::ParseError> ComputeInstruc
     if (semanticStack[1].HasValue(Operations::Assignment)) {
         auto destination = semanticStack[0].TryGetData<::Destination>();
         if (!destination) {
-            return std::unexpected(ParseError::InvalidDestination);
+            return std::unexpected(Instructions::ParseError::InvalidDestination);
         }
 
         result.Destination = *destination;
@@ -179,7 +179,7 @@ std::string ComputeInstruction::ToString() const {
     return std::format("{}{}{}{}{}{}", destinationToString(Destination), eq, operandToString(Comparison.Left), operationToString(Comparison.Operation), operandToString(Comparison.Right), jumpToString(Jump));
 }
 
-std::expected<AddressingInstruction, AddressingInstruction::ParseError> AddressingInstruction::Create(const SemanticToken& semantic) {
+std::expected<AddressingInstruction, Instructions::ParseError> AddressingInstruction::Create(const SemanticToken& semantic) {
     if (const uint16_t* integer = semantic.TryGetData<uint16_t>(); integer) {
         return AddressingInstruction{ *integer };
     }
@@ -188,7 +188,7 @@ std::expected<AddressingInstruction, AddressingInstruction::ParseError> Addressi
         return AddressingInstruction{ *variable };
     }
 
-    return std::unexpected(ParseError::InvalidSemanticTokenType);
+    return std::unexpected(Instructions::ParseError::InvalidSemanticTokenType);
 }
 
 std::string AddressingInstruction::ToString() const {
