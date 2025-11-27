@@ -53,6 +53,7 @@ namespace Lexer {
 
     struct Token {
         TokenType Type;
+        uint32_t CharactersConsumed;
         std::string Data;
     };
 

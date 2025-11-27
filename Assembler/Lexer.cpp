@@ -39,8 +39,11 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
     char character;
     State state = State::None;
     TokenType tokenType = TokenType::EndOfStream;
-    
+    uint32_t charactersConsumed = 0;
+
     while (state != State::Terminal && stream.get(character).good()) {
+        charactersConsumed++;
+
         switch (state) {
         case State::None:
             if (character == '\n') { state = State::Newline; }
@@ -63,6 +66,7 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
             if (!IsSymbol(character)) {
                 state = State::Terminal;
                 stream.get();
+                charactersConsumed += 2; // Accounts for ( and ) characters
             }
             break;
         case State::Integer:
@@ -75,6 +79,7 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
 
         if (state == State::Terminal) {
             stream.unget();
+            charactersConsumed--;
             break;
         }
 
@@ -83,5 +88,5 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
         }
     }
 
-    return { tokenType, token};
+    return { tokenType, charactersConsumed, token };
 }
