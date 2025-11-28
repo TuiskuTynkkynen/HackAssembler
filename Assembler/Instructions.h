@@ -55,5 +55,3 @@ struct AddressingInstruction {
     static std::expected<AddressingInstruction, Instructions::ParseError> Create(const SemanticToken& semanticToken);
     std::string ToString() const;
 };
-
-using Instruction = std::variant<AddressingInstruction, ComputeInstruction>;

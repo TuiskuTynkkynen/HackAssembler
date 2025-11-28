@@ -39,11 +39,11 @@ public:
     }
 };
 
-static constexpr bool CollapseStack(std::vector<SemanticToken>& semanticStack, std::vector<Instruction>& instructions, DebugState& debug) {
+static constexpr bool CollapseStack(std::vector<SemanticToken>& semanticStack, std::vector<std::variant<AddressingInstruction, ComputeInstruction>>& instructions, DebugState& debug) {
     if (semanticStack.empty()) return false;
 
 
-    std::expected<Instruction, Instructions::ParseError> result;
+    std::expected<std::variant<AddressingInstruction, ComputeInstruction>, Instructions::ParseError> result;
     if (semanticStack.size() == 1) {
         result = AddressingInstruction::Create(semanticStack.front());
     }
@@ -75,7 +75,8 @@ static constexpr bool CollapseStack(std::vector<SemanticToken>& semanticStack, s
 };
 
 std::optional<Parser::ParseResult> Parser::Parse(std::istream& stream) {
-    std::vector<Instruction> instructions;
+    std::vector<std::variant<AddressingInstruction, ComputeInstruction>> instructions;
+    
     std::vector<SemanticToken> semanticStack;
     bool errors = false;
 
@@ -127,5 +128,5 @@ std::optional<Parser::ParseResult> Parser::Parse(std::istream& stream) {
         debug.ExpressionAdd(token);
     }
 
-    return errors ? std::optional<ParseResult>(std::nullopt) : std::optional<ParseResult>(instructions);
+    return errors ? std::optional<ParseResult>(std::nullopt) : std::optional<ParseResult>(std::in_place, instructions, symbols);
 }
