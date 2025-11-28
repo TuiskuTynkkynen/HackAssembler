@@ -22,13 +22,20 @@ struct Comparison {
 };
 
 namespace Instructions {
-    enum class ParseError : uint8_t {
-        InvalidSemanticTokenType, 
-        InvalidSemanticTokenCount,
-        InvalidOperationOrder,
-        InvalidDestination,
-        InvalidOperand,
-        InvalidJump,
+    struct ParseError {
+        enum Types : uint8_t {
+            InvalidSemanticTokenType,
+            InvalidSemanticTokenCount,
+            InvalidOperationOrder,
+            InvalidDestination,
+            InvalidOperand,
+            InvalidJump,
+        };
+
+        Types Type;
+        uint8_t StackIndex;
+
+        ParseError(Types type, uint8_t stackIndex) : Type(type), StackIndex(stackIndex) {}
     };
 }
 
