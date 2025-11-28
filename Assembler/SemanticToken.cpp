@@ -97,6 +97,8 @@ std::expected<SemanticToken, SemanticToken::ParseError> SemanticToken::Create(co
     case Lexer::TokenType::Integer:
         return ParseInteger(token.Data).transform(construct);
     case Lexer::TokenType::String:
+        if (token.Data.empty() || token.Data.front() - '0' <= 9) return std::unexpected(ParseError::InvalidTokenData);
+        
         registers = TryParseRegisters(token.Data);
         if (registers) return construct(registers.value());
 
