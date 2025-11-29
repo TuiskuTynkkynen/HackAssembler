@@ -76,7 +76,8 @@ static constexpr bool CollapseStack(std::vector<SemanticToken>& semanticStack, s
 
 std::optional<Parser::ParseResult> Parser::Parse(std::istream& stream) {
     std::vector<std::variant<AddressingInstruction, ComputeInstruction>> instructions;
-    
+    SymbolMap symbols;
+
     std::vector<SemanticToken> semanticStack;
     bool errors = false;
 
@@ -101,7 +102,15 @@ std::optional<Parser::ParseResult> Parser::Parse(std::istream& stream) {
             token.Type = Lexer::TokenType::String;
             result = SemanticToken::Create(token);
             if (result.has_value() && result.value().GetType() == SemanticToken::Type::Variable) {
-                Log::Message("Label : {} -> {}", token.Data, instructions.size());
+                if (symbols.TryAddLabel(token.Data, static_cast<uint16_t>(instructions.size()))) {
+                    continue;
+                }
+                
+                Log::ErrorHeader(debug.StreamInfo.LineNumber, debug.StreamInfo.LineLength);
+                Log::Message("Label has already been defined defined");
+                Log::ErrorLine(Log::StreamState{ stream, debug.StreamInfo.LineNumber, debug.StreamInfo.LineLength, debug.StreamInfo.LineLength - token.Data.length() - 1, token.Data.length() });
+
+                errors = true;
                 continue;
             } 
 

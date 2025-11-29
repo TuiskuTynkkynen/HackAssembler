@@ -8,6 +8,7 @@
 namespace Parser {
     struct ParseResult {
         std::vector<std::variant<AddressingInstruction, ComputeInstruction>> Instructions;
+        SymbolMap Symbols;
     };
 
     std::optional<ParseResult> Parse(std::istream& stream);
