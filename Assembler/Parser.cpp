@@ -139,3 +139,31 @@ std::optional<Parser::ParseResult> Parser::Parse(std::istream& stream) {
 
     return errors ? std::optional<ParseResult>(std::nullopt) : std::optional<ParseResult>(std::in_place, instructions, symbols);
 }
+
+std::vector<std::variant<LoadInstruction, ComputeInstruction>> Parser::ParseResult::ResolveSymbols(ParseResult& parsed) {
+     auto transform = [&parsed](const auto& instruction) {
+        if constexpr (std::is_convertible_v<ComputeInstruction, decltype(instruction)>) {
+            return std::variant<LoadInstruction, ComputeInstruction>(instruction);
+        } else {
+            auto variable = std::get_if<std::string>(&instruction.Variable);
+
+            if (!variable) {
+                return std::variant<LoadInstruction, ComputeInstruction>(LoadInstruction{ std::get<uint16_t>(instruction.Variable) });
+            }
+
+            uint16_t value = parsed.Symbols.TryGet(*variable)
+                .or_else([&] { return std::optional<uint16_t>(parsed.Symbols.AddVariable(*variable)); })
+                .value();
+
+            return std::variant<LoadInstruction, ComputeInstruction>(LoadInstruction{ value });
+        }};
+
+    std::vector<std::variant<LoadInstruction, ComputeInstruction>> result;
+    result.reserve(parsed.Instructions.size());
+
+    for (const auto& instruction : parsed.Instructions) {
+        result.emplace_back(std::visit(transform, instruction));
+    }
+
+    return result;
+}

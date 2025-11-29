@@ -194,3 +194,7 @@ std::expected<AddressingInstruction, Instructions::ParseError> AddressingInstruc
 std::string AddressingInstruction::ToString() const {
     return std::visit([](const auto& obj) { return std::format("Load {}", obj); }, Variable);
 }
+
+std::string LoadInstruction::ToString() const {
+    return std::format("Load {}", value);
+}

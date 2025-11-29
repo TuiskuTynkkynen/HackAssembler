@@ -55,3 +55,9 @@ struct AddressingInstruction {
     static std::expected<AddressingInstruction, Instructions::ParseError> Create(const SemanticToken& semanticToken);
     std::string ToString() const;
 };
+
+struct LoadInstruction {
+    uint16_t value;
+
+    std::string ToString() const;
+};
