@@ -16,7 +16,7 @@ static constexpr std::expected<Operations, SemanticToken::ParseError> ParseOpera
     case '+':
         return Operations::Addition;
     case '-':
-        return Operations::Substraction;
+        return Operations::Subtraction;
     case '&':
         return Operations::BitwiseAnd;
     case '|':
@@ -112,7 +112,7 @@ std::expected<SemanticToken, SemanticToken::ParseError> SemanticToken::Create(co
 }
 
 static constexpr bool IsUnary(Operations operation) {
-    return operation == Operations::Negation || operation == Operations::Substraction;
+    return operation == Operations::Negation || operation == Operations::Subtraction;
 }
 
 bool SemanticToken::ValidAfter(const SemanticToken& previous) const {

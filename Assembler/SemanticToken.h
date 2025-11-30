@@ -11,7 +11,7 @@ enum class Operations : uint8_t {
     Assignment,
     Negation,
     Addition,
-    Substraction,
+    Subtraction,
     BitwiseAnd,
     BitwiseOr,
     Jump,

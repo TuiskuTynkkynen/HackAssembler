@@ -4,7 +4,7 @@
 
 static constexpr bool IsUnaryOperation(const SemanticToken& semantic) {
     auto ptr = semantic.TryGetData<Operations>();
-    return ptr && (*ptr == Operations::Negation || *ptr == Operations::Substraction);
+    return ptr && (*ptr == Operations::Negation || *ptr == Operations::Subtraction);
 }
 
 static constexpr std::expected<Operands, Instructions::ParseError> TryParseOperand(const SemanticToken& semantic, uint8_t stackIndex) {
@@ -139,7 +139,7 @@ std::string ComputeInstruction::ToString() const {
             return " !";
         case Operations::Addition:
             return " +";
-        case Operations::Substraction:
+        case Operations::Subtraction:
             return " -";
         case Operations::BitwiseAnd:
             return " &";
