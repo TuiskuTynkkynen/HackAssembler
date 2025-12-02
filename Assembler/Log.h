@@ -5,17 +5,22 @@
 #include "Instructions.h"
 
 #include <print>
+#include <iostream>
+#include <fstream>
+#include <optional>
 
 class Log {
 public:
     template<typename... Args>
     static void Message(std::format_string<Args...> fmt, Args&&... args) {
-        std::println(m_OutputStream, fmt, std::forward<Args>(args)...);
+        std::ostream& out = m_OutputStream.has_value() ? m_OutputStream.value() : std::cout;
+        std::println(out, fmt, std::forward<Args>(args)...);
     }
     
     template<typename... Args>
     static void InlineMessage(std::format_string<Args...> fmt, Args&&... args) {
-        std::print(m_OutputStream, fmt, std::forward<Args>(args)...);
+        std::ostream& out = m_OutputStream.has_value() ? m_OutputStream.value() : std::cout;
+        std::print(out, fmt, std::forward<Args>(args)...);
     }
 
     struct StreamState {
@@ -46,9 +51,10 @@ public:
     static void ErrorHeader(size_t lineNumber, size_t characterNumber);
 
     static void SetInputStreamName(std::string name) { m_StreamName = name; }
-    static void SetOutput(std::FILE* stream) { m_OutputStream = stream; }
+    static void SetOutput(std::ofstream&& stream) { m_OutputStream.emplace(std::move(stream)); }
+    static void ResetOutput() { m_OutputStream.reset(); }
 private:
-    inline static std::FILE* m_OutputStream = stdout;
+    inline static std::optional<std::ofstream> m_OutputStream;
     inline static std::string m_StreamName = "Input Stream";
 };
 
