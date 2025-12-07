@@ -2,7 +2,7 @@
 
 #include "Lexer.h"
 #include "SemanticToken.h"
-#include "Log.h"
+#include "IO/Log.h"
 
 #include <expected>
 #include <istream>

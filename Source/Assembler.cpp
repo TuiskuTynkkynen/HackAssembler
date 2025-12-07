@@ -1,7 +1,7 @@
-#include "Parser.h"
-#include "Log.h"
-#include "CodeGeneration.h"
+#include "Assembler/Parser.h"
+#include "Assembler/CodeGeneration.h"
 
+#include "IO/Log.h"
 #include "IO/File.h"
 #include "IO/CLI.h"
 

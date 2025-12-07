@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Lexer.h"
-#include "SemanticToken.h"
-#include "Instructions.h"
+#include "Assembler/Lexer.h"
+#include "Assembler/SemanticToken.h"
+#include "Assembler/Instructions.h"
 
 #include <print>
 #include <iostream>

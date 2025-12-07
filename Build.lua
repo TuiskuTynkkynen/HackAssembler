@@ -12,4 +12,4 @@ workspace "HackAssembler"
 
 OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
-include "Assembler/Build.lua"
+include "Source/Build.lua"

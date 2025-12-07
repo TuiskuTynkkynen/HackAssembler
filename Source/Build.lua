@@ -9,6 +9,10 @@ project "Assembler"
       "./**.h", "./**.cpp",
    }
 
+   includedirs{
+       "./",
+   }
+
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
    objdir ("../Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
 
