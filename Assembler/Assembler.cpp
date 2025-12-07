@@ -3,29 +3,42 @@
 #include "CodeGeneration.h"
 
 #include "IO/File.h"
+#include "IO/CLI.h"
 
-int main() {
-    auto input = IO::TryOpenFileInput("in.asm");
+int main(int argc, char** argv) {
+    auto options = CLI::ParseArguments({ argv, static_cast<size_t>(argc) });
+    if (!options.has_value()) {
+        Log::Message("assembler: {}", options.error().Message);
+        Log::Message("usage: {}", CLI::GetUsge());
+        return 1;
+    }
+
+    Log::SetInputStreamName(options.value().InputFile);
+    auto input = IO::TryOpenFileInput(options.value().InputFile);
     if (!input.has_value()) {
-        Log::Message("Could not open {} for reading", IO::GetAblsolutePath("in.asm"));
-        return 1;
-    }
-    
-    auto output = IO::TryOpenFileOutput("out.hack");
-    if (!output.has_value()) {
-        Log::Message("Could not open {} for writing", IO::GetAblsolutePath("out.hack"));
+        Log::Message("Could not open {} for reading", IO::GetAblsolutePath(options.value().InputFile));
         return 1;
     }
 
-    Log::Message("{} -> {}", IO::GetAblsolutePath("test.asm"), IO::GetAblsolutePath("out.hack"));
+    auto output = IO::TryOpenFileOutput(options.value().OutputFile);
+    if (!output.has_value()) {
+        Log::Message("Could not open {} for writing", IO::GetAblsolutePath(options.value().OutputFile));
+        return 1;
+    }
 
     auto code = input.and_then([](auto&& s) { return Parser::Parse(s); })
         .transform([](auto&& p) { return Parser::ParseResult::ResolveSymbols(p); })
-        .transform(CodeGeneration::GenerateCode)
-        .value();
+        .transform(CodeGeneration::GenerateCode);
+
+    if (!code.has_value()) {
+        return 1;
+    }
 
     Log::SetOutput(std::move(output.value()));
-    for (auto c : code) {
-         Log::Message("{:0>16b}", c);
+    for (uint16_t c : code.value()) {
+        Log::Message("{:0>16b}", c);
     }
+
+    Log::ResetOutput();
+    Log::Message("{} -> {}", IO::GetAblsolutePath(options.value().InputFile), IO::GetAblsolutePath(options.value().OutputFile));
 }
