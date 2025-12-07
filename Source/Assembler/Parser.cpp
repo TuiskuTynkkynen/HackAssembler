@@ -29,7 +29,7 @@ public:
 
     void ExpressionAdd(const Lexer::Token& token) {
         TokenStack.push_back(token);
-        if (StreamInfo.ExpressionOffset != -1) {
+        if (StreamInfo.ExpressionOffset != (size_t)-1) {
             StreamInfo.ExpressionLength += token.CharactersConsumed;
             return;
         }
@@ -120,6 +120,7 @@ std::optional<Parser::ParseResult> Parser::Parse(std::istream& stream) {
             errors |= CollapseStack(semanticStack, instructions, debug);
             debug.AddLine();
             continue;
+	default: break;
         }
 
         result = SemanticToken::Create(token);

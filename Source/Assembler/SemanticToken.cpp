@@ -107,9 +107,9 @@ std::expected<SemanticToken, SemanticToken::ParseError> SemanticToken::Create(co
         if (jump) return construct(jump.value());
 
         return ParseVariable(token.Data).transform(construct);
+    default:
+        return std::unexpected(ParseError::InvalidTokenType);
     }
-
-    return std::unexpected(ParseError::InvalidTokenType);
 }
 
 static constexpr bool IsUnary(Operations operation) {

@@ -75,6 +75,9 @@ Lexer::Token Lexer::GetNextToken(std::istream& stream) {
         case State::String:
             state = !IsSymbol(character) ? State::Terminal : state;
             break;
+        case State::Terminal:
+            assert(false); // This should never be reached
+            break;
         }
 
         if (state == State::Terminal) {
