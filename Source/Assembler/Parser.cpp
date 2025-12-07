@@ -107,14 +107,14 @@ std::optional<Parser::ParseResult> Parser::Parse(std::istream& stream) {
                 }
                 
                 Log::ErrorHeader(debug.StreamInfo.LineNumber, debug.StreamInfo.LineLength);
-                Log::Message("Label has already been defined defined");
+                Log::Message("Label has already been defined");
                 Log::ErrorLine(Log::StreamState{ stream, debug.StreamInfo.LineNumber, debug.StreamInfo.LineLength, debug.StreamInfo.LineLength - token.Data.length() - 1, token.Data.length() });
 
                 errors = true;
                 continue;
             } 
 
-            Log::Error(result.error(), token.Type, Log::StreamState{ stream, debug.StreamInfo.LineNumber, debug.StreamInfo.LineLength, debug.StreamInfo.LineLength - token.Data.length() - 1, token.Data.length() });
+            Log::Error(result.error(), Lexer::TokenType::Label, Log::StreamState{ stream, debug.StreamInfo.LineNumber, debug.StreamInfo.LineLength, debug.StreamInfo.LineLength - token.Data.length() - 1, token.Data.length() });
             continue;
         case Newline:
             errors |= CollapseStack(semanticStack, instructions, debug);
