@@ -3,6 +3,7 @@
 #include <string>
 #include <string_view>
 #include <cassert>
+#include <cstdint>
 
 namespace Lexer {
     class TokenType {

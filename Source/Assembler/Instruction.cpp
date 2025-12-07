@@ -116,6 +116,8 @@ std::string ComputeInstruction::ToString() const {
 
     auto operandToString = [](Operands o) {
         switch (o) {
+        case Operands::None:
+            break; 
         case Operands::Zero:
             return " 0";
         case Operands::One:
@@ -133,6 +135,8 @@ std::string ComputeInstruction::ToString() const {
 
     auto operationToString = [](Operations op) {
         switch (op) {
+        case Operations::None:
+            break;
         case Operations::Assignment:
             return " =";
         case Operations::Negation:
@@ -154,6 +158,8 @@ std::string ComputeInstruction::ToString() const {
 
     auto jumpToString = [](Jumps jump) {
         switch (jump) {
+        case Jumps::None:
+            break;
         case Jumps::JMP:
             return " ; JMP";
         case Jumps::JGT:

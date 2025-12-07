@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <charconv>
+#include <limits>
 
 static constexpr std::expected<Operations, SemanticToken::ParseError> ParseOperation(const std::string_view token) {
     if (token.size() != 1) {
