@@ -34,7 +34,7 @@ public:
             return;
         }
 
-        StreamInfo.ExpressionOffset += StreamInfo.LineLength - token.Data.length() + 1;
+        StreamInfo.ExpressionOffset += StreamInfo.LineLength - token.Data.length();
         StreamInfo.ExpressionLength += token.Data.length();
     }
 };
