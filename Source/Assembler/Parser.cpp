@@ -64,9 +64,13 @@ static constexpr bool CollapseStack(std::vector<SemanticToken>& semanticStack, s
     if (error.StackIndex < debug.TokenStack.size()) {
         debug.StreamInfo.TokenLength = debug.TokenStack.front().Data.length();
 
-        auto fold = [](size_t lhs, const Lexer::Token& rhs) { return lhs + rhs.CharactersConsumed; };
-        debug.StreamInfo.TokenOffset = debug.StreamInfo.ExpressionOffset + std::accumulate(debug.TokenStack.begin() + 1, debug.TokenStack.begin() + error.StackIndex, (size_t)0, fold);
-        debug.StreamInfo.TokenOffset += debug.TokenStack[error.StackIndex].CharactersConsumed;
+        debug.StreamInfo.TokenOffset = debug.StreamInfo.ExpressionOffset;
+        
+        if (error.StackIndex != 0) {
+            auto fold = [](size_t lhs, const Lexer::Token& rhs) { return lhs + rhs.CharactersConsumed; };
+            debug.StreamInfo.TokenOffset += std::accumulate(debug.TokenStack.begin() + 1, debug.TokenStack.begin() + error.StackIndex, (size_t)0, fold);
+            debug.StreamInfo.TokenOffset += debug.TokenStack[error.StackIndex].CharactersConsumed;
+        }
     }
 
     Log::Error(error, debug.StreamInfo);
