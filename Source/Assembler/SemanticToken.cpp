@@ -49,15 +49,9 @@ static constexpr std::optional<Destination> TryParseRegisters(const std::string_
     size_t registerCount = 0;
     Destination registers{};
 
-    constexpr auto ContainsAt = [](const std::string_view str, char character, size_t index) {
-        return str.length() > index && str[index] == character;
-        };
-
-    registerCount += registers.A = ContainsAt(token, 'A', registerCount);
-
-    registerCount += registers.D = ContainsAt(token, 'D', registerCount);
-
-    registerCount += registers.M = ContainsAt(token, 'M', registerCount);
+    registerCount += registers.A = token.find('A') < 3;
+    registerCount += registers.D = token.find('D') < 3;
+    registerCount += registers.M = token.find('M') < 3;
 
     if (token.length() == registerCount) {
         return registers;
