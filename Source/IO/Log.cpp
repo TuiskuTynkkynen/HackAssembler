@@ -52,7 +52,12 @@ void Log::InstructionError(Instructions::ParseError error) {
     case InvalidOperand:
     case InvalidJumpOrder:
     case InvalidJump:
-        Message("Expression could not be parsed as a compute instruction");
+    case MissingEffect:
+    case InvalidRegisterOperandOrder:
+    case InvalidRegisterOperands:
+    case InvalidNumericOperand:
+    case InvalidOneOperand:
+    case InvalidZeroOperand:
         break;
     }
 }

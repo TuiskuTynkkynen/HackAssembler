@@ -29,6 +29,36 @@ static constexpr std::expected<Operands, Instructions::ParseError> TryParseOpera
     return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidOperand, stackIndex);
 }
 
+std::expected<ComputeInstruction, Instructions::ParseError> Validate(ComputeInstruction instruction) {
+    bool hasAssignment = instruction.Destination.A || instruction.Destination.D || instruction.Destination.M;
+    if (!hasAssignment && instruction.Jump == Jumps::None) {
+        return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::MissingEffect, -1);
+    }
+    
+    auto& comparison = instruction.Comparison;
+    if ((comparison.Left == Operands::A || comparison.Right == Operands::A) && (comparison.Left == Operands::M || comparison.Right == Operands::M)) {
+        return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidRegisterOperands, -1);
+    }
+
+    if ((comparison.Left == Operands::Zero || comparison.Left == Operands::One) && comparison.Operation != Operations::None) {
+        return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidNumericOperand, hasAssignment * 2);
+    }
+
+    if (comparison.Right == Operands::Zero && comparison.Operation != Operations::None) {
+        return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidZeroOperand, 2 + hasAssignment * 2);
+    }
+
+    if ((comparison.Right == Operands::One || comparison.Left == Operands::One) && (comparison.Operation == Operations::Negation || comparison.Operation == Operations::BitwiseAnd || comparison.Operation == Operations::BitwiseOr)) {
+        return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidOneOperand, (hasAssignment + (comparison.Right == Operands::One)) * 2);
+    }
+
+    if (comparison.Right == Operands::D && !(comparison.Operation == Operations::None || comparison.Operation == Operations::Subtraction || comparison.Operation == Operations::Negation)) {
+        return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidRegisterOperandOrder, 2 + hasAssignment * 2);
+    }
+
+    return instruction;
+}
+
 std::expected<ComputeInstruction, Instructions::ParseError> ComputeInstruction::Create(std::span<const SemanticToken> semanticStack) {
     if (1 >= semanticStack.size() || semanticStack.size() > 7){
         return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidSemanticTokenCount, -1);
@@ -100,6 +130,8 @@ std::expected<ComputeInstruction, Instructions::ParseError> ComputeInstruction::
         }
 
         result.Destination = *destination;
+
+        return Validate(result);
     }
 
     if (semanticStack[1].HasValue(Operations::Jump)) {
@@ -107,11 +139,20 @@ std::expected<ComputeInstruction, Instructions::ParseError> ComputeInstruction::
         if (!res.has_value()) {
             return std::unexpected(res.error());
         }
-    
+
         result.Comparison.Right = res.value();
+
+        return Validate(result);
     }
 
-    return result;
+    auto res = TryParseOperand(semanticStack[0], 0);
+    if (!res.has_value()) {
+        return std::unexpected(res.error());
+    }
+
+    result.Comparison.Left = res.value();
+
+    return Validate(result);
 }
 
 std::string ComputeInstruction::ToString() const {

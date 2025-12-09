@@ -34,6 +34,12 @@ namespace Instructions {
             InvalidOperand,
             InvalidJumpOrder,
             InvalidJump,
+            MissingEffect,
+            InvalidRegisterOperandOrder,
+            InvalidRegisterOperands,
+            InvalidNumericOperand,
+            InvalidOneOperand,
+            InvalidZeroOperand,
         };
 
         Types Type;
