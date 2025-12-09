@@ -136,7 +136,8 @@ std::optional<Parser::ParseResult> Parser::Parse(std::istream& stream) {
             continue;
         }
 
-        if (!semanticStack.empty() && !result.value().ValidAfter(semanticStack.back())) {
+        bool hasWhiteSpace = token.CharactersConsumed != token.Data.length();
+        if (!semanticStack.empty() && hasWhiteSpace && !result.value().ValidAfter(semanticStack.back())) {
             errors |= CollapseStack(semanticStack, instructions, debug);
         }
 
