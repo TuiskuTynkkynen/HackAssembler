@@ -37,6 +37,11 @@ std::expected<ComputeInstruction, Instructions::ParseError> ComputeInstruction::
     ComputeInstruction result = {};
 
     const int32_t maxIndex = static_cast<int32_t>(semanticStack.size()) - 1;
+
+    if (semanticStack[maxIndex].GetType() == SemanticToken::Type::Operation) {
+        return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidOperationOrder, maxIndex);
+    }
+
     for (int32_t currentIndex = maxIndex; 0 < currentIndex; currentIndex -= 2) {
         if (currentIndex == 1 && semanticStack[0].GetType() == SemanticToken::Type::Registers) { // Ugly hack
             break; 
@@ -44,12 +49,16 @@ std::expected<ComputeInstruction, Instructions::ParseError> ComputeInstruction::
         
         const Operations* operation = semanticStack[currentIndex - 1].TryGetData<Operations>();
         if (!operation) {
-            return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidOperationOrder, currentIndex - 1);
+            if (semanticStack[currentIndex].GetType() == SemanticToken::Type::Operation) {
+                return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::MissingOperand, currentIndex);
+            }
+
+            return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::MissingOperation, currentIndex - 1);
         }
 
         if (*operation == Operations::Jump) {
             if (currentIndex != maxIndex) {
-                return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidOperationOrder, currentIndex - 1);
+                return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidJumpOrder, currentIndex - 1);
             }
 
             auto jump = semanticStack[currentIndex].TryGetData<Jumps>();
@@ -63,7 +72,7 @@ std::expected<ComputeInstruction, Instructions::ParseError> ComputeInstruction::
 
         if (*operation == Operations::Assignment) {
             if (currentIndex != 2) { // Must be last operation
-                return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidOperationOrder, currentIndex - 1);
+                return std::unexpected<Instructions::ParseError>(std::in_place, Instructions::ParseError::InvalidAssignmentOrder, currentIndex - 1);
             }
 
             auto res = IsUnaryOperation(semanticStack[currentIndex]) ? Operands::None : TryParseOperand(semanticStack[currentIndex], static_cast<uint8_t>(currentIndex));

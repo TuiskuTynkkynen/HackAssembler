@@ -27,8 +27,12 @@ namespace Instructions {
             InvalidSemanticTokenType,
             InvalidSemanticTokenCount,
             InvalidOperationOrder,
+            MissingOperation,
+            MissingOperand,
+            InvalidAssignmentOrder,
             InvalidDestination,
             InvalidOperand,
+            InvalidJumpOrder,
             InvalidJump,
         };
 

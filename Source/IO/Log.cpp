@@ -45,8 +45,12 @@ void Log::InstructionError(Instructions::ParseError error) {
         break;
     case InvalidSemanticTokenCount:
     case InvalidOperationOrder:
+    case MissingOperation:
+    case MissingOperand:
+    case InvalidAssignmentOrder:
     case InvalidDestination:
     case InvalidOperand:
+    case InvalidJumpOrder:
     case InvalidJump:
         Message("Expression could not be parsed as a compute instruction");
         break;
