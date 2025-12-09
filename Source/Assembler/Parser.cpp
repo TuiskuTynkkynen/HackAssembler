@@ -34,7 +34,7 @@ public:
             return;
         }
 
-        StreamInfo.ExpressionOffset += StreamInfo.LineLength - token.Data.length();
+        StreamInfo.ExpressionOffset += StreamInfo.LineLength - token.Data.length() + 1;
         StreamInfo.ExpressionLength += token.Data.length();
     }
 };
@@ -121,10 +121,12 @@ std::optional<Parser::ParseResult> Parser::Parse(std::istream& stream) {
             Log::Error(result.error(), Lexer::TokenType::Label, Log::StreamState{ stream, debug.StreamInfo.LineNumber, debug.StreamInfo.LineLength, debug.StreamInfo.LineLength - token.Data.length() - 1, token.Data.length() });
             continue;
         case Newline:
+            debug.StreamInfo.LineLength++;
             errors |= CollapseStack(semanticStack, instructions, debug);
             debug.AddLine();
             continue;
-	default: break;
+	    default: 
+            break;
         }
 
         result = SemanticToken::Create(token);
