@@ -41,30 +41,59 @@ void Log::InstructionError(Instructions::ParseError error) {
     switch (error.Type) {
         using enum Instructions::ParseError::Types;
     case InvalidSemanticTokenType:
-        Message("Expression could not be parsed as a addressing instruction");
+        Message("Expression could not be parsed as an addressing instruction. Not a valid variable name or integer constant");
         break;
     case InvalidSemanticTokenCount:
+        Message("Expression could not be parsed as a compute instruction. It contains too many tokens");
+        break;
     case InvalidOperationOrder:
+        Message("Last token of compute instruction must be an operand (i.e. \"D\", \"M\", \"1\") or a jump mnemonic (i.e. \"JMP\", \"JGT\").");
+        break;
     case MissingOperation:
+        Message("Expected the assignment operator (\"=\"), the jump operator (\";\") or an comparison operator (i.e. \"+\", \"!\", \"&\").");
+        break;
     case MissingOperand:
+        Message("Expected an operand (i.e. \"D\", \"M\", \"1\").");
+        break;
     case InvalidAssignmentOrder:
+        Message("Only a destination mnemonic (i.e. \"A\", \"D\", \"ADM\") may appear before the assignment operator (\"=\").");
+        break;
     case InvalidDestination:
+        Message("Not a valid destination for assignment (i.e. \"A\", \"D\", \"ADM\").");
+        break;
     case InvalidOperand:
+        Message("Not a valid operand (\"A\", \"D\", \"M\", \"0\", \"1\" or \"-1\").");
+        break;
     case InvalidJumpOrder:
+        Message("Only a jump mnemonic (i.e. \"JMP\", \"JGT\") may appear after the jump operator (\";\").");
+        break;
     case InvalidJump:
+        Message("Not a valid jump mnemonic (i.e. \"JMP\", \"JGT\").");
+        break;
     case MissingEffect:
+        Message("Compute instruction must contain an assignment or a jump.");
+        break;
     case InvalidRegisterOperandOrder:
+        Message("Register D may not appear on the right side of the addition (\"+\"), bitwise and (\"&\"), and bitwise or (\"|\") operators");
+        break;
     case InvalidRegisterOperands:
+        Message("Compute instruction comparison may not use both A and M registers");
+        break;
     case InvalidNumericOperand:
+        Message("A numeric operand may not appear on the left side of an comparison operator (i.e. \"+\", \"!\", \"&\").");
+        break;
     case InvalidOneOperand:
+        Message("The one operand may not be used with the negation (\"!\"), bitwise and (\"&\"), and bitwise or (\"|\") operators");
+        break;
     case InvalidZeroOperand:
+        Message("The zero operand may only appear after the assignment operator (\"=\") or before the jump operator (\";\")");
         break;
     }
 }
 
 static std::string GetLine(std::istream& stream, size_t lineLength) {
     std::streampos current = stream.tellg();
-
+    
     std::streampos offset = -std::min(static_cast<std::streampos>(lineLength), current);
     stream.seekg(offset, std::ios::cur);
 
